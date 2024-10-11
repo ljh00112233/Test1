@@ -2,8 +2,8 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function Loading() {
-    return <View style={style.container}>
-        <Text style={style.text}>getting the character1</Text>
+    return <View style={styles.container}>
+        <Text style={styles.text}>getting the character1</Text>
     </View>
 };
 
