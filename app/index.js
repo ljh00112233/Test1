@@ -55,8 +55,8 @@ const CharacterDetails = ({ data }) => {
     ArmoryEquipment,
   } = data;
 
-  const groupedEquipment = groupEquipmentByType(ArmoryEquipment);
   const imageUrl = `${ArmoryProfile.CharacterImage}`;
+  const groupedEquipment = groupEquipmentByType(ArmoryEquipment);
 
   return (
     <ScrollView style={styles.resultContainer}>
@@ -73,8 +73,6 @@ const CharacterDetails = ({ data }) => {
       {Object.keys(groupedEquipment).map((type, index) => (
         <EquipmentSection key={index} type={ArmoryEquipment.Type} items={groupedEquipment[type]} />
       ))}
-
-
     </ScrollView>
   );
 };
