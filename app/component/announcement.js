@@ -16,12 +16,10 @@ const announcement = () => {
           },
         });
 
-        const announcementsWithIds = response.data.map((item, index) => ({
-          ...item,
-          id: index + 1,
-        }));
+        const limitedData = response.data.slice(0, 5);
+        setAnnouncements(limitedData);
+        setLoading(false);
 
-        setAnnouncements(announcementsWithIds);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -47,7 +45,7 @@ const announcement = () => {
   return (
     <FlatList
       data={announcements}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <TouchableOpacity onPress={() => openLink(item.Link)} style={styles.item}>
           <Text style={styles.title}>{item.Title || 'No Title'}</Text>
