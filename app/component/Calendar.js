@@ -1,12 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Text, FlatList, StyleSheet, ActivityIndicator, Linking, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { Text, FlatList, StyleSheet, ActivityIndicator, Linking, TouchableOpacity, Image, SafeAreaView, View } from 'react-native';
 import axios from 'axios';
 
 const Calendar = () => {
   const [Calendar, setCalendar] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const flatListRef = useRef(null);
 
+  const scrollToTop = () => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToIndex({ animated: true, index: 0 });
+    }
+  };
   useEffect(() => {
     const fetchCalendar = async () => {
       try {
@@ -16,7 +22,7 @@ const Calendar = () => {
           },
         });
 
-        const limitedData = response.data.slice(0, 5);
+        const limitedData = response.data;
         setCalendar(limitedData);
         setLoading(false);
       } catch (err) {
@@ -40,33 +46,51 @@ const Calendar = () => {
   if (error) {
     return <Text>Error: {error}</Text>;
   }
-  
+
   return (
-    <FlatList
-      data={Calendar}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <TouchableOpacity onPress={() => openLink(item.Link)} style={styles.item}>
-          <Text style={styles.title}>{item.CategoryName || 'No Title'}</Text>
-          <Text style={styles.title}>{item.ContentsName || 'No Title'}</Text>
-          <Image
-          source={{ uri: (`${item.ContentsIcon}`) }}
-          style={styles.characterImage}
-          resizeMode="cover"
-          onError={(e) => console.log('이미지 로드 오류:', e.nativeCalendar.error)}
-          />
-          <Text style={styles.text}>{item.Location || 'No Title'}</Text>
-          <Text style={styles.text}>{item.StartTimes[0] || 'No Title'}</Text>
-          <Text style={styles.text}>{item.StartTimes[1] || 'No Title'}</Text>
-          <Text style={styles.text}>{item.StartTimes[2] || 'No Title'}</Text>
-        </TouchableOpacity>
-        
-      )}
-    />
+    <SafeAreaView style={styles.container}>
+      <View style={styles.subContainer}>
+        <Text style={styles.mainText}>오늘의 일정</Text>
+      </View>
+      <TouchableOpacity style={styles.button} onPress={scrollToTop}>
+        <Text style={styles.buttonText}>▲</Text>
+      </TouchableOpacity>
+      <FlatList
+        ref={flatListRef}
+        data={Calendar}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => openLink(item.Link)} style={styles.item}>
+            <Text style={styles.title}>{item.CategoryName || 'No Title'}</Text>
+            <Text style={styles.title}>{item.ContentsName || 'No Title'}</Text>
+            <Image
+              source={{ uri: (`${item.ContentsIcon}`) }}
+              style={styles.characterImage}
+              resizeMode="cover"
+              onError={(e) => console.log('이미지 로드 오류:', e.nativeCalendar.error)}
+            />
+            <Text style={styles.text}>{item.Location || 'No Title'}</Text>
+            <Text style={styles.text}>{item.StartTimes[0] || 'No Title'}</Text>
+            <Text style={styles.text}>{item.StartTimes[1] || 'No Title'}</Text>
+            <Text style={styles.text}>{item.StartTimes[2] || 'No Title'}</Text>
+          </TouchableOpacity>
+
+        )}
+      />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#151720'
+  },
+  subContainer: {
+    flex: 1,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
   item: {
     padding: 20,
     borderBottomWidth: 1,
@@ -75,17 +99,37 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#F7F7F0',
   },
-  text:{
+  text: {
     fontSize: 15,
     fontWeight: 'bold',
+    color: '#F7F7F0',
   },
-    characterImage: {
+  characterImage: {
     width: 50,
     height: 50,
     borderRadius: 8,
     marginBottom: 12,
     backgroundColor: '#e0e0e0',
+  },
+  mainText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#F7F7F0',
+  },
+  button: {
+    position: 'absolute',
+    bottom: 3,
+    right: 1,
+    backgroundColor: 'gray',
+    padding: 10,
+    borderRadius: 5,
+    zIndex: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
 

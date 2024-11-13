@@ -1,13 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, Linking, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, Linking, TouchableOpacity, SafeAreaView } from 'react-native';
 import axios from 'axios';
 
 const announcement = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const flatListRef = useRef(null);
 
+  const scrollToTop = () => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToIndex({ animated: true, index: 0 });
+    }
+  };
   useEffect(() => {
+
     const fetchAnnouncements = async () => {
       try {
         const response = await axios.get('https://developer-lostark.game.onstove.com/news/notices', {
@@ -16,7 +23,7 @@ const announcement = () => {
           },
         });
 
-        const limitedData = response.data.slice(0, 5);
+        const limitedData = response.data
         setAnnouncements(limitedData);
         setLoading(false);
 
@@ -43,21 +50,37 @@ const announcement = () => {
   }
 
   return (
-    <FlatList
-      data={announcements}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <TouchableOpacity onPress={() => openLink(item.Link)} style={styles.item}>
-          <Text style={styles.title}>{item.Title || 'No Title'}</Text>
-          <Text>{item.Date || 'No Date'}</Text>
-        </TouchableOpacity>
-      )}
-    />
+    <SafeAreaView style={styles.container}>
+      <TouchableOpacity style={styles.button} onPress={scrollToTop}>
+        <Text style={styles.buttonText}>▲</Text>
+      </TouchableOpacity>
+      <FlatList
+        ref={flatListRef}
+        data={announcements}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => openLink(item.Link)} style={styles.item}>
+            <Text style={styles.title}>{item.Title || 'No Title'}</Text>
+            <Text style={styles.title}>{item.Date || 'No Date'}</Text>
+          </TouchableOpacity>
+        )}
+      />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#151720'
+  },
+  subContainer: {
+    flex: 1,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
   item: {
+    flex: 1,
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
@@ -65,6 +88,24 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#F7F7F0',
+  },
+  mainText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#F7F7F0',
+  }, button: {
+    position: 'absolute',
+    bottom: 3,
+    right: 1,
+    backgroundColor: 'gray',
+    padding: 10,
+    borderRadius: 5,
+    zIndex: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
 

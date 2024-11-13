@@ -1,12 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Text, FlatList, StyleSheet, ActivityIndicator, Linking, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { Text, FlatList, StyleSheet, ActivityIndicator, Linking, TouchableOpacity, Image, StatusBar, SafeAreaView, View } from 'react-native';
 import axios from 'axios';
 
 const Event = () => {
   const [Events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const flatListRef = useRef(null);
 
+  const scrollToTop = () => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToIndex({ animated: true, index: 0 });
+    }
+  };
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -16,7 +22,7 @@ const Event = () => {
           },
         });
 
-        const limitedData = response.data.slice(0, 5);
+        const limitedData = response.data;
         setEvents(limitedData);
         setLoading(false);
 
@@ -41,29 +47,47 @@ const Event = () => {
   if (error) {
     return <Text>Error: {error}</Text>;
   }
-  
+
   return (
-    <FlatList
-      data={Events}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <TouchableOpacity onPress={() => openLink(item.Link)} style={styles.item}>
-          <Text style={styles.title}>{item.Title || 'No Title'}</Text>
-          <Image
-          source={{ uri: (`${item.Thumbnail}`) }}
-          style={styles.characterImage}
-          resizeMode="cover"
-          onError={(e) => console.log('이미지 로드 오류:', e.nativeEvent.error)}
-          />
-          <Text style={styles.text}>{item.StartDate || 'No Title'}~{item.EndDate || 'No Title'}</Text>
-        </TouchableOpacity>
-        
-      )}
-    />
+    <SafeAreaView style={styles.container}>
+      <View style={styles.subContainer}>
+        <Text style={styles.mainText}>이벤트</Text>
+      </View>
+      <TouchableOpacity style={styles.button} onPress={scrollToTop}>
+        <Text style={styles.buttonText}>▲</Text>
+      </TouchableOpacity>
+      <FlatList
+        ref={flatListRef}
+        data={Events}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => openLink(item.Link)} style={styles.item}>
+            <StatusBar barStyle="dark-content" />
+            <Text style={styles.title}>{item.Title || 'No Title'}</Text>
+            <Image
+              source={{ uri: (`${item.Thumbnail}`) }}
+              style={styles.characterImage}
+              resizeMode="cover"
+              onError={(e) => console.log('이미지 로드 오류:', e.nativeEvent.error)}
+            />
+            <Text style={styles.text}>{item.StartDate || 'No Title'}~{item.EndDate || 'No Title'}</Text>
+          </TouchableOpacity>
+        )}
+      />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#151720'
+  },
+  subContainer: {
+    flex: 1,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
   item: {
     padding: 20,
     borderBottomWidth: 1,
@@ -72,17 +96,35 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#F7F7F0',
   },
-  text:{
+  text: {
     fontSize: 15,
-    fontWeight: 'bold',
+    color: '#F7F7F0',
   },
-    characterImage: {
+  characterImage: {
     width: '100%',
-    height: 200,
+    height: 150,
     borderRadius: 8,
-    marginBottom: 12,
-    backgroundColor: '#e0e0e0',
+    marginBottom: 5,
+  },
+  mainText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#F7F7F0',
+  },
+  button: {
+    position: 'absolute',
+    bottom: 3,
+    right: 1,
+    backgroundColor: 'gray',
+    padding: 10,
+    borderRadius: 5,
+    zIndex: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
 

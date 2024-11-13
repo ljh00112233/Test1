@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_KEY, API_BASE_URL } from './apiKey.js';
+import { API_KEY, API_BASE_URL } from './apiKey';
 
 const lostArkApi = axios.create({
   baseURL: API_BASE_URL,
