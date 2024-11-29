@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, Linking, TouchableOpacity, SafeAreaView } from 'react-native';
 import axios from 'axios';
 
@@ -6,13 +6,6 @@ const announcement = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const flatListRef = useRef(null);
-
-  const scrollToTop = () => {
-    if (flatListRef.current) {
-      flatListRef.current.scrollToIndex({ animated: true, index: 0 });
-    }
-  };
   useEffect(() => {
 
     const fetchAnnouncements = async () => {
@@ -51,17 +44,26 @@ const announcement = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={scrollToTop}>
-        <Text style={styles.buttonText}>▲</Text>
-      </TouchableOpacity>
+      <View style={styles.subContainer}>
+        <TouchableOpacity 
+          style={{flex: 1, backgroundColor: 'grey', padding: 5, borderRadius: 5}}
+          onPress={() => openLink('https://lostark.game.onstove.com/News/Notice/List')}
+        >
+          <Text style={styles.text}>
+            더보기
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.subContainer}>
+        <Text style={styles.mainText}>공지사항</Text>
+      </View>
       <FlatList
-        ref={flatListRef}
-        data={announcements}
+        data={announcements.slice(0, 6)}
         keyExtractor={(item) => item.id}
+        nestedScrollEnabled={true}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => openLink(item.Link)} style={styles.item}>
             <Text style={styles.title}>{item.Title || 'No Title'}</Text>
-            <Text style={styles.title}>{item.Date || 'No Date'}</Text>
           </TouchableOpacity>
         )}
       />
@@ -72,10 +74,14 @@ const announcement = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#151720'
+    backgroundColor: '#151720',
+    margin: 10,
+    borderStyle: 'solid',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: 'white',
   },
   subContainer: {
-    flex: 1,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
@@ -90,11 +96,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#F7F7F0',
   },
+  text: {
+    fontSize: 15,
+    color: '#F7F7F0',
+  },
+  characterImage: {
+    width: 10,
+    height:10,
+    borderRadius: 8,
+    marginBottom: 5,
+  },
   mainText: {
     fontSize: 30,
     fontWeight: 'bold',
     color: '#F7F7F0',
-  }, button: {
+  },
+  button: {
     position: 'absolute',
     bottom: 3,
     right: 1,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, FlatList, StyleSheet, ActivityIndicator, Linking, TouchableOpacity, Image, StatusBar, SafeAreaView, View } from 'react-native';
 import axios from 'axios';
 
@@ -6,13 +6,7 @@ const Event = () => {
   const [Events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const flatListRef = useRef(null);
 
-  const scrollToTop = () => {
-    if (flatListRef.current) {
-      flatListRef.current.scrollToIndex({ animated: true, index: 0 });
-    }
-  };
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -51,15 +45,22 @@ const Event = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.subContainer}>
+        <TouchableOpacity 
+          style={{ flex: 1, backgroundColor: 'grey', padding: 5, borderRadius: 5 }}
+          onPress={() => openLink('https://lostark.game.onstove.com/News/Event/Now')}
+        >
+          <Text style={styles.text}>
+            더보기
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.subContainer}>
         <Text style={styles.mainText}>이벤트</Text>
       </View>
-      <TouchableOpacity style={styles.button} onPress={scrollToTop}>
-        <Text style={styles.buttonText}>▲</Text>
-      </TouchableOpacity>
       <FlatList
-        ref={flatListRef}
-        data={Events}
+        data={Events.slice(0, 6)}
         keyExtractor={(item) => item.id}
+        nestedScrollEnabled={true}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => openLink(item.Link)} style={styles.item}>
             <StatusBar barStyle="dark-content" />
@@ -70,7 +71,6 @@ const Event = () => {
               resizeMode="cover"
               onError={(e) => console.log('이미지 로드 오류:', e.nativeEvent.error)}
             />
-            <Text style={styles.text}>{item.StartDate || 'No Title'}~{item.EndDate || 'No Title'}</Text>
           </TouchableOpacity>
         )}
       />
@@ -81,14 +81,19 @@ const Event = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#151720'
+    backgroundColor: '#151720',
+    margin: 10,
+    borderStyle: 'solid',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: 'white',
   },
   subContainer: {
-    flex: 1,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
   item: {
+    flex: 1,
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
@@ -103,8 +108,8 @@ const styles = StyleSheet.create({
     color: '#F7F7F0',
   },
   characterImage: {
-    width: '100%',
-    height: 150,
+    width: 'auto',
+    height: 75,
     borderRadius: 8,
     marginBottom: 5,
   },

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, FlatList, StyleSheet, ActivityIndicator, Linking, TouchableOpacity, Image, SafeAreaView, View } from 'react-native';
 import axios from 'axios';
 
@@ -6,13 +6,7 @@ const Calendar = () => {
   const [Calendar, setCalendar] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const flatListRef = useRef(null);
 
-  const scrollToTop = () => {
-    if (flatListRef.current) {
-      flatListRef.current.scrollToIndex({ animated: true, index: 0 });
-    }
-  };
   useEffect(() => {
     const fetchCalendar = async () => {
       try {
@@ -52,15 +46,11 @@ const Calendar = () => {
       <View style={styles.subContainer}>
         <Text style={styles.mainText}>오늘의 일정</Text>
       </View>
-      <TouchableOpacity style={styles.button} onPress={scrollToTop}>
-        <Text style={styles.buttonText}>▲</Text>
-      </TouchableOpacity>
       <FlatList
-        ref={flatListRef}
-        data={Calendar}
+        data={Calendar.slice(0,5)}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => openLink(item.Link)} style={styles.item}>
+          <View style={styles.item}>
             <Text style={styles.title}>{item.CategoryName || 'No Title'}</Text>
             <Text style={styles.title}>{item.ContentsName || 'No Title'}</Text>
             <Image
@@ -73,7 +63,7 @@ const Calendar = () => {
             <Text style={styles.text}>{item.StartTimes[0] || 'No Title'}</Text>
             <Text style={styles.text}>{item.StartTimes[1] || 'No Title'}</Text>
             <Text style={styles.text}>{item.StartTimes[2] || 'No Title'}</Text>
-          </TouchableOpacity>
+          </View>
 
         )}
       />
@@ -84,10 +74,14 @@ const Calendar = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#151720'
+    backgroundColor: '#151720',
+    margin: 10,
+    borderStyle: 'solid',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: 'white',
   },
   subContainer: {
-    flex: 1,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },

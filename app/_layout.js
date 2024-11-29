@@ -19,11 +19,15 @@ export default function RootLayout() {
             headerTitleStyle: {color: '#ffffff', fontSize: 24},
             headerTitleAlign: 'center',
         }}>
+            <Stack.Screen name='List' options={{
+                headerTitle: 'LoaHub',
+            }}
+            />
             <Stack.Screen name='index' options={{
                 headerTitle: 'LoaHub',
             }}
             />
-            <Stack.Screen name='component/Home' options={{
+            <Stack.Screen name='component/character/Home' options={{
                 headerTitle: '캐릭터 검색',
             }}
             />
@@ -41,6 +45,10 @@ export default function RootLayout() {
             />
             <Stack.Screen name='component/Event' options={{
                 headerTitle: '이벤트',
+            }}
+            />
+            <Stack.Screen name='component/post/post' options={{
+                headerTitle: '게시판',
             }}
             />
         </Stack>

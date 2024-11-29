@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { SafeAreaView, View, Text, TextInput, Button, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import axios from 'axios';
 import { API_KEY, API_BASE_URL } from './apiKey';
+import { Link } from "expo-router";
 
 const App = () => {
   const [characterName, setCharacterName] = useState('');
@@ -15,15 +16,29 @@ const App = () => {
       flatListRef.current.scrollToIndex({ animated: true, index: 0 });
     }
   };
+
   const searchSiblings = async () => {
+    const response = await axios.get(`${API_BASE_URL}/${characterName}/siblings`, {
+      headers: {
+        'Authorization': `Bearer ${API_KEY}`,
+      },
+    });
+    const data = response.data;
+    if(data.length === 0){
+      setError(null);
+      setSiblingsData(null);
+      setError('원정대 정보를 찾을 수 없습니다.');
+      return;
+    }
     if (!characterName) {
+      setError(null);
+      setSiblingsData(null);
       setError('캐릭터 이름을 입력하세요.');
       return;
     }
     setLoading(true);
     setError(null);
     setSiblingsData(null);
-
     try {
       const response = await axios.get(`${API_BASE_URL}/${characterName}/siblings`, {
         headers: {
@@ -33,16 +48,24 @@ const App = () => {
 
       const data = response.data;
       setSiblingsData(data);
-
+      if(!data){
+        setError('원정대 정보를 찾을 수 없습니다.');  
+      }
     } catch (err) {
       setError('원정대 정보를 찾을 수 없습니다.');
     } finally {
       setLoading(false);
     }
   };
-  console.log(siblingsData)
+
   return (
     <SafeAreaView style={styles.container}>
+                  <TouchableOpacity style={styles.LOAHUBButton}>
+                <Link
+                href='../../List'>
+                    <Text style={{fontSize:50, color: '#F7F7F0'}}>LOAHUB</Text>
+                </Link>
+            </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={scrollToTop}>
         <Text style={styles.buttonText}>▲</Text>
       </TouchableOpacity>
@@ -123,6 +146,10 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  LOAHUBButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
